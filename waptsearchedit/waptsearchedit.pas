@@ -40,14 +40,12 @@ type
       property SearchIconSpacingLeft: Integer read FSearchIconSpacingLeft write SetSearchIconSpacingLeft;
       property SearchIconVisible: Boolean read GetSearchIconVisible write SetSearchIconVisible;
       property OnSearchIconClick: TNotifyEvent read GetOnSearchIconClick write SetOnSearchIconClick;
-      procedure SearchIconClickDefault(Sender: TObject);
 
   end;
 
 procedure Register;
 
 implementation
-
 {$R icons.rc}
 
 procedure Register;
@@ -134,7 +132,6 @@ begin
   FEmbeddedImage.Picture.LoadFromResourceName(HINSTANCE,'SEARCH_ICON',TPortableNetworkGraphic);
   FEmbeddedImage.stretch := true;
   FEmbeddedImage.Visible := true;
-  FEmbeddedImage.OnClick := @SearchIconClickDefault;
   FEmbeddedImage.Cursor := crHandPoint;
 end;
 
@@ -165,9 +162,7 @@ begin
   end;
 end;
 
-procedure TWaptSearchEdit.SearchIconClickDefault(Sender: TObject);
-begin
-  Text := '';
-end;
+initialization
+  {$I waptsearchedit.lrs}
 
 end.
