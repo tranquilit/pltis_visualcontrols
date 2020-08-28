@@ -36,8 +36,6 @@ type
      constructor Create(AOwner: TComponent); override;
 
   published
-      //property EmbeddedImage: TImage read FEmbeddedImage write FEmbeddedImage;
-      //property ImagePanel: TPanel read FImagePanel write FImagePanel;
       property SearchIconSize: TConstraintSize read FSearchIconSize write SetSearchIconSize;
       property SearchIconSpacingLeft: Integer read FSearchIconSpacingLeft write SetSearchIconSpacingLeft;
       property SearchIconVisible: Boolean read GetSearchIconVisible write SetSearchIconVisible;
