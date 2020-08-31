@@ -17,6 +17,7 @@ type
      FImagePanel: TPanel;
      FSearchIconSize: TConstraintSize;
      FSearchIconSpacingLeft: Integer;
+     FSearchIconIsHidden: Boolean;
      procedure SetUpEdit;
      procedure SetUpPanel;
      procedure SetUpImage;
@@ -27,6 +28,8 @@ type
      procedure SetSearchIconVisible(Value: Boolean);
      function GetOnSearchIconClick: TNotifyEvent;
      procedure SetOnSearchIconClick(Value: TNotifyEvent);
+     function GetFontSize: Integer;
+     procedure HideIconForText;
 
   protected
       procedure SetParent(NewParent: TWinControl); override;
@@ -34,6 +37,7 @@ type
 
   public
      constructor Create(AOwner: TComponent); override;
+     procedure TextChanged; override;
 
   published
       property SearchIconSize: TConstraintSize read FSearchIconSize write SetSearchIconSize;
@@ -55,14 +59,14 @@ end;
 
 procedure TWaptSearchEdit.SetSearchIconSize(Value: TConstraintSize);
 begin
-  if FSearchIconSize = Value then exit;
+  if FSearchIconSize = Value then Exit;
   FSearchIconSize := Value;
   DoSetBounds(Left, Top, Width, Height);
 end;
 
 procedure TWaptSearchEdit.SetSearchIconSpacingLeft(Value: Integer);
 begin
-  if FSearchIconSpacingLeft = Value then exit;
+  if FSearchIconSpacingLeft = Value then Exit;
   FSearchIconSpacingLeft := Value;
   DoSetBounds(Left, Top, Width, Height);
 end;
@@ -74,7 +78,6 @@ end;
 
 procedure TWaptSearchEdit.SetSearchIconVisible(Value: Boolean);
 begin
-  if FImagePanel.Visible = Value then exit;
   FImagePanel.Visible := Value;
 end;
 
@@ -85,8 +88,40 @@ end;
 
 procedure TWaptSearchEdit.SetOnSearchIconClick(Value: TNotifyEvent);
 begin
-  if FEmbeddedImage.OnClick = Value then exit;
   FEmbeddedImage.OnClick := Value;
+end;
+
+function TWaptSearchEdit.GetFontSize: Integer;
+var
+  c: TBitmap;
+  char_len: Integer;
+begin
+  c := TBitmap.Create;
+  c.Canvas.Font.Assign(self.Font);
+  if length(self.Text) = 0 then
+  begin
+    Result := 0;
+    Exit;
+  end;
+  char_len := c.Canvas.TextWidth(self.Text) div length(self.Text);
+  Result := c.Canvas.TextWidth(self.Text) + char_len;
+end;
+
+procedure TWaptSearchEdit.HideIconForText;
+var
+  max_width : Integer;
+begin
+  max_width := Width - FSearchIconSize - FSearchIconSpacingLeft;
+  if (GetFontSize >= max_width) and GetSearchIconVisible then
+  begin
+    SetSearchIconVisible(false);
+    FSearchIconIsHidden := true;
+  end
+  else if (GetFontSize < max_width) and FSearchIconIsHidden then
+  begin
+    SetSearchIconVisible(true);
+    FSearchIconIsHidden := false;
+  end;
 end;
 
 procedure TWaptSearchEdit.SetParent(NewParent: TWinControl);
@@ -100,10 +135,10 @@ procedure TWaptSearchEdit.DoSetBounds(ALeft, ATop, AWidth, AHeight: integer);
 begin
   inherited DoSetBounds(ALeft, ATop, AWidth, AHeight);
 
-  if FEmbeddedImage = nil then exit;
+  if FEmbeddedImage = nil then Exit;
   FEmbeddedImage.SetBounds(ALeft, ATop,  FSearchIconSize, FSearchIconSize);
 
-  if FImagePanel = nil then exit;
+  if FImagePanel = nil then Exit;
   FImagePanel.SetBounds(ALeft + AWidth - FSearchIconSpacingLeft - FSearchIconSize,
   ATop + (height div 2 - SearchIconSize div 2), FImagePanel.Width, FImagePanel.Height);
 end;
@@ -133,6 +168,7 @@ begin
   FEmbeddedImage.stretch := true;
   FEmbeddedImage.Visible := true;
   FEmbeddedImage.Cursor := crHandPoint;
+  FSearchIconIsHidden := false;
 end;
 
 procedure TWaptSearchEdit.SetDefault;
@@ -160,6 +196,12 @@ begin
     FEmbeddedImage := TImage.Create(FImagePanel);
     SetUpImage;
   end;
+end;
+
+procedure TWaptSearchEdit.TextChanged;
+begin
+  inherited TextChanged;
+  HideIconForText;
 end;
 
 initialization
