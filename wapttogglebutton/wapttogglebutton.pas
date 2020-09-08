@@ -5,7 +5,7 @@ unit WaptToggleButton;
 interface
 
 uses
-  Classes, LResources, SysUtils, Controls, Graphics, Buttons, ExtCtrls;
+  Classes, LResources, SysUtils, Controls, Graphics, Buttons, ExtCtrls, Dialogs;
 
 type
 
@@ -16,12 +16,12 @@ type
     FImage1: TButtonGlyph;
     FImage2: TButtonGlyph;
     ToggleState: Boolean;
-    FClickPan: TPanel;
+    FClickPan: TPaintBox;
     function getImageOne: TBitmap;
     procedure setImageOne(Value: TBitmap);
     function getImageTwo: TBitmap;
     procedure setImageTwo(Value: TBitmap);
-    procedure SetPanInvisible(Pan: TPanel);
+    procedure SetPanInvisible(Pan: TPaintBox);
 
   protected
     procedure SetParent(NewParent: TWinControl); override;
@@ -103,6 +103,16 @@ procedure TWaptToggleButton.Loaded;
 begin
   inherited Loaded;
   Glyph := FImage1.Glyph;
+
+  if FClickPan = nil then
+  begin
+    FClickPan := TPaintBox.Create(self.Parent);
+    SetPanInvisible(FClickPan);
+    FClickPan.OnClick := @OnClickPan;
+    SetParent(self.Parent);
+    ShowMessage('T1');
+    DoSetBounds(Left, Top, Width, Height);
+  end;
 end;
 
 function TWaptToggleButton.getImageOne: TBitmap;
@@ -128,13 +138,15 @@ begin
   Invalidate;
 end;
 
-procedure TWaptToggleButton.SetPanInvisible(Pan: TPanel);
+procedure TWaptToggleButton.SetPanInvisible(Pan: TPaintBox);
 begin
   Pan.Caption := '';
-  Pan.BevelOuter := bvNone;
-  Pan.BevelInner := bvNone;
+ // Pan.BevelOuter := bvNone;
+  //Pan.BevelInner := bvNone;
   Pan.Color := clDefault;
   Pan.Cursor := crDefault;
+ // PAN.Color := clRed;
+  //Pan.ControlStyle := Pan.ControlStyle + [csNoDesignSelectable];
 end;
 
 procedure TWaptToggleButton.SetParent(NewParent: TWinControl);
@@ -149,21 +161,14 @@ procedure TWaptToggleButton.DoSetBounds(ALeft, ATop, AWidth, AHeight: integer);
 begin
   inherited DoSetBounds(ALeft, ATop, AWidth, AHeight);
 
-  if FClickPan = nil then exit;
+  if FClickPan = nil then Exit;
+  ShowMessage('T2');
   FClickPan.SetBounds(ALeft, ATop, AWidth, AHeight);
 end;
 
 constructor TWaptToggleButton.Create(AOwner: TComponent);
 begin
   inherited Create(AOwner);
-
-  if FClickPan = nil then
-  begin
-    FClickPan := TPanel.Create(self);
-    SetPanInvisible(FClickPan);
-    FClickPan.OnClick := @OnClickPan;
-  end;
-
   ToggleState := false;
   FImage1 := TButtonGlyph.Create;
   FImage2 := TButtonGlyph.Create;
