@@ -8,16 +8,21 @@
       <Version Value="11"/>
       <PathDelim Value="\"/>
       <SearchPaths>
-        <OtherUnitFiles Value="waptsearchedit"/>
+        <OtherUnitFiles Value="waptsearchedit;wapttogglebutton"/>
         <UnitOutputDirectory Value="lib\$(TargetCPU)-$(TargetOS)"/>
       </SearchPaths>
     </CompilerOptions>
-    <Files Count="1">
+    <Files Count="2">
       <Item1>
         <Filename Value="waptsearchedit\waptsearchedit.pas"/>
         <HasRegisterProc Value="True"/>
         <UnitName Value="WaptSearchEdit"/>
       </Item1>
+      <Item2>
+        <Filename Value="wapttogglebutton\wapttogglebutton.pas"/>
+        <HasRegisterProc Value="True"/>
+        <UnitName Value="WaptToggleButton"/>
+      </Item2>
     </Files>
     <RequiredPkgs Count="2">
       <Item1>

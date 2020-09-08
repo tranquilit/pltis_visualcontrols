@@ -54,7 +54,7 @@ implementation
 
 procedure Register;
 begin
-  RegisterComponents('Standard',[TWaptSearchEdit]);
+  RegisterComponents('Wapt',[TWaptSearchEdit]);
 end;
 
 procedure TWaptSearchEdit.SetSearchIconSize(Value: TConstraintSize);
