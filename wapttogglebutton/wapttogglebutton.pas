@@ -16,17 +16,21 @@ type
     FImage1: TButtonGlyph;
     FImage2: TButtonGlyph;
     ToggleState: Boolean;
-    FClickPan: TPaintBox;
+    FClickBox: TPaintBox;
     function getImageOne: TBitmap;
     procedure setImageOne(Value: TBitmap);
     function getImageTwo: TBitmap;
     procedure setImageTwo(Value: TBitmap);
-    procedure SetPanInvisible(Pan: TPaintBox);
+    procedure SetBoxDefault(Box: TPaintBox);
+    procedure InterMouseEnter(Sender: TObject);
+    procedure InterMouseLeave(Sender: TObject);
 
   protected
     procedure SetParent(NewParent: TWinControl); override;
     procedure DoSetBounds(ALeft, ATop, AWidth, AHeight: integer); override;
     procedure Loaded; override;
+    procedure MouseEnter; override;
+    procedure MouseLeave; override;
 
   public
     procedure OnClickPan(Sender: TObject);
@@ -104,15 +108,23 @@ begin
   inherited Loaded;
   Glyph := FImage1.Glyph;
 
-  if FClickPan = nil then
+  if FClickBox = nil then
   begin
-    FClickPan := TPaintBox.Create(self.Parent);
-    SetPanInvisible(FClickPan);
-    FClickPan.OnClick := @OnClickPan;
+    FClickBox := TPaintBox.Create(self);
+    SetBoxDefault(FClickBox);
     SetParent(self.Parent);
-    ShowMessage('T1');
     DoSetBounds(Left, Top, Width, Height);
   end;
+end;
+
+procedure TWaptToggleButton.MouseEnter;
+begin
+  inherited MouseEnter;
+end;
+
+procedure TWaptToggleButton.MouseLeave;
+begin
+  inherited MouseLeave;
 end;
 
 function TWaptToggleButton.getImageOne: TBitmap;
@@ -138,32 +150,41 @@ begin
   Invalidate;
 end;
 
-procedure TWaptToggleButton.SetPanInvisible(Pan: TPaintBox);
+procedure TWaptToggleButton.SetBoxDefault(Box: TPaintBox);
 begin
-  Pan.Caption := '';
- // Pan.BevelOuter := bvNone;
-  //Pan.BevelInner := bvNone;
-  Pan.Color := clDefault;
-  Pan.Cursor := crDefault;
- // PAN.Color := clRed;
-  //Pan.ControlStyle := Pan.ControlStyle + [csNoDesignSelectable];
+  Box.Caption := '';
+  Box.Color := clDefault;
+  Box.Cursor := crDefault;
+  Box.ControlStyle := Box.ControlStyle + [csNoDesignSelectable];
+  Box.OnClick := @OnClickPan;
+  Box.OnMouseEnter := @InterMouseEnter;
+  Box.OnMouseleave := @InterMouseLeave;
+end;
+
+procedure TWaptToggleButton.InterMouseEnter(Sender: TObject);
+begin
+  MouseEnter;
+end;
+
+procedure TWaptToggleButton.InterMouseLeave(Sender: TObject);
+begin
+  MouseLeave;
 end;
 
 procedure TWaptToggleButton.SetParent(NewParent: TWinControl);
 begin
   inherited SetParent(NewParent);
 
-  if FClickPan = nil then exit;
-  FClickPan.Parent := NewParent;
+  if FClickBox = nil then exit;
+  FClickBox.Parent := NewParent;
 end;
 
 procedure TWaptToggleButton.DoSetBounds(ALeft, ATop, AWidth, AHeight: integer);
 begin
   inherited DoSetBounds(ALeft, ATop, AWidth, AHeight);
 
-  if FClickPan = nil then Exit;
-  ShowMessage('T2');
-  FClickPan.SetBounds(ALeft, ATop, AWidth, AHeight);
+  if FClickBox = nil then Exit;
+  FClickBox.SetBounds(ALeft, ATop, AWidth, AHeight);
 end;
 
 constructor TWaptToggleButton.Create(AOwner: TComponent);
