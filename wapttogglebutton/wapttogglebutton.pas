@@ -15,7 +15,6 @@ type
   private
     FImage1: TButtonGlyph;
     FImage2: TButtonGlyph;
-    ToggleState: Boolean;
     FClickBox: TPaintBox;
     function getImageOne: TBitmap;
     procedure setImageOne(Value: TBitmap);
@@ -33,9 +32,11 @@ type
     procedure MouseLeave; override;
 
   public
+    ToggleState: Boolean;
     procedure OnClickPan(Sender: TObject);
     constructor Create(AOwner: TComponent); override;
     destructor Destroy; override;
+    procedure SetButtonState(TState: Boolean);
 
   published
     property ImageState1: TBitmap read getImageOne write setImageOne;
@@ -96,10 +97,7 @@ end;
 procedure TWaptToggleButton.OnClickPan(Sender: TObject);
 begin
   ToggleState := (not ToggleState);
-  if ToggleState then
-    Glyph := FImage2.Glyph
-  else
-    Glyph := FImage1.Glyph;
+  SetButtonState(ToggleState);
   if Assigned(OnClick) then OnClick(Sender);
 end;
 
@@ -200,6 +198,14 @@ begin
   inherited Destroy;
   FreeAndNil(FImage1);
   FreeAndNil(FImage2);
+end;
+
+procedure TWaptToggleButton.SetButtonState(TState: Boolean);
+begin
+    if TState then
+    Glyph := FImage2.Glyph
+  else
+    Glyph := FImage1.Glyph;
 end;
 
 initialization
