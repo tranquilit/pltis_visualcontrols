@@ -8,7 +8,7 @@ unit pltis_visualcontrols;
 interface
 
 uses
-  WaptSearchEdit, WaptToggleButton, LazarusPackageIntf;
+  WaptSearchEdit, WaptToggleButton, wapttagedit, LazarusPackageIntf;
 
 implementation
 
@@ -16,6 +16,7 @@ procedure Register;
 begin
   RegisterUnit('WaptSearchEdit', @WaptSearchEdit.Register);
   RegisterUnit('WaptToggleButton', @WaptToggleButton.Register);
+  RegisterUnit('wapttagedit', @wapttagedit.Register);
 end;
 
 initialization

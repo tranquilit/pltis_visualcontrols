@@ -8,11 +8,16 @@
       <Version Value="11"/>
       <PathDelim Value="\"/>
       <SearchPaths>
-        <OtherUnitFiles Value="waptsearchedit;wapttogglebutton"/>
+        <OtherUnitFiles Value="waptsearchedit;wapttogglebutton;wapttagedit"/>
         <UnitOutputDirectory Value="lib\$(TargetCPU)-$(TargetOS)"/>
       </SearchPaths>
+      <Linking>
+        <Debugging>
+          <DebugInfoType Value="dsDwarf3"/>
+        </Debugging>
+      </Linking>
     </CompilerOptions>
-    <Files Count="2">
+    <Files Count="3">
       <Item1>
         <Filename Value="waptsearchedit\waptsearchedit.pas"/>
         <HasRegisterProc Value="True"/>
@@ -23,6 +28,11 @@
         <HasRegisterProc Value="True"/>
         <UnitName Value="WaptToggleButton"/>
       </Item2>
+      <Item3>
+        <Filename Value="wapttagedit\wapttagedit.pas"/>
+        <HasRegisterProc Value="True"/>
+        <UnitName Value="wapttagedit"/>
+      </Item3>
     </Files>
     <RequiredPkgs Count="2">
       <Item1>
@@ -39,5 +49,8 @@
       <Version Value="2"/>
       <UseFileFilters Value="True"/>
     </PublishOptions>
+    <CustomOptions Items="ExternHelp" Version="2">
+      <_ExternHelp Items="Count"/>
+    </CustomOptions>
   </Package>
 </CONFIG>
