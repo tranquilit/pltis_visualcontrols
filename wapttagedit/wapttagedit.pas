@@ -2,12 +2,12 @@ unit wapttagedit;
 
 {$mode objfpc}{$H+}
 
-{Code from }
+{Code from https://specials.rejbrand.se/}
 
 interface
 
 uses
-  Windows, Messages, SysUtils, Classes, Controls, StdCtrls, Forms, Graphics,
+  {$ifdef windows}Windows,{$endif}LCLType, Messages, SysUtils, Classes, Controls, StdCtrls, Forms, Graphics,
   Types, Menus;
 
 type
@@ -15,9 +15,9 @@ type
   GetTagIndex = word;
 
 const TAG_LOW = 0;
-const TAG_HIGH = MAXWORD - 2;
-const EDITOR = MAXWORD - 1;
-const NOWHERE = MAXWORD;
+const TAG_HIGH = MaxInt - 2;
+const EDITOR = MaxInt  - 1;
+const NOWHERE = MaxInt;
 
 const PART_BODY = $00000000;
 const PART_REMOVE_BUTTON = $00010000;
@@ -33,7 +33,7 @@ type
   private
     { Private declarations }
     FTags: TStringList;
-    FEdit: TEdit;
+    FEdit: TComboBox;
     FBgColor: TColor;
     FBorderColor: TColor;
     FTagBgColor: TColor;
@@ -160,7 +160,11 @@ end;
 
 function IsKeyDown(const VK: integer): boolean;
 begin
+  {$ifdef windows}
   IsKeyDown := GetKeyState(VK) and $8000 <> 0;
+  {$else}
+  IsKeyDown := False;
+  {$endif}
 end;
 
 function GetTagPart(ClickInfo: TClickInfo): cardinal;
@@ -175,12 +179,22 @@ var
   mnuItem: TMenuItem;
 begin
   inherited;
-  FEdit := TEdit.Create(Self);
+  FEdit := TComboBox.Create(Self);
   FEdit.Parent := Self;
   FEdit.BorderStyle := bsNone;
   FEdit.Visible := false;
   FEdit.OnKeyPress := @EditKeyPress;
   FEdit.OnExit := @EditExit;
+
+  FEdit.AutoComplete := True;
+  FEdit.AutoCompleteText := [cbactEnabled, cbactEndOfLineComplete, cbactSearchAscending];
+  FEdit.Items.Text :=
+    '(All)'#13#10+
+    'Windows'#13#10+
+    'Mac'#13#10+
+    'Linux'#13#10;
+  FEdit.BorderWidth:=0;
+  FEdit.BorderStyle:=bsNone;
 
   FTags := TStringList.Create;
   FTags.OnChange := @TagChange;
@@ -293,7 +307,6 @@ end;
 
 procedure TTagEditor.EditKeyPress(Sender: TObject; var Key: Char);
 begin
-
   if (Key = chr(VK_SPACE)) and (FEdit.Text = '') and FNoLeadingSpaceInput then
   begin
     Key := #0;
@@ -448,14 +461,18 @@ end;
 
 procedure TTagEditor.CreateCaret;
 begin
+  {$ifdef windows}
   if not FCaretVisible then
     FCaretVisible := Windows.CreateCaret(Handle, 0, 0, FActualTagHeight);
+  {$endif}
 end;
 
 procedure TTagEditor.DestroyCaret;
 begin
   if not FCaretVisible then Exit;
+  {$ifdef windows}
   Windows.DestroyCaret;
+  {$endif}
   FCaretVisible := false;
 end;
 
@@ -465,13 +482,13 @@ var
 begin
   inherited;
 
+  {$ifdef windows}
   if IsKeyDown(VK_LBUTTON) and
     InRange(GetTagIndex(FMouseDownClickInfo), TAG_LOW, TAG_HIGH) then
   begin
     FDragging := true;
     Screen.Cursor := crDrag;
     SepIndex := GetSeparatorIndexAt(X, Y);
-    TForm(Parent).Caption := IntToStr(SepIndex);
     CreateCaret;
     if SepIndex = FTags.Count then
       SetCaretPos(FLefts[SepIndex - 1] + FWidths[SepIndex - 1] + FSpacing div 2,
@@ -481,6 +498,7 @@ begin
     ShowCaret(Handle);
     Exit;
   end;
+  {$endif}
 
   case GetTagIndex(GetClickInfoAt(X,Y)) of
     NOWHERE: Cursor := crArrow;
@@ -704,8 +722,12 @@ begin
     S := FTags[i];
     if not FShrunk then
       S := S + ' ×';
+    {$ifdef windows}
     DrawTextW(Canvas.Handle, PWideChar(Utf8Decode(S)), -1, R, DT_SINGLELINE or DT_VCENTER or
       DT_LEFT or DT_END_ELLIPSIS or DT_NOPREFIX);
+    {$else}
+    Canvas.TextOut(R.Left,R.Top,S);
+    {$endif}
     Canvas.Brush.Style := bsSolid;
   end;
 
@@ -718,7 +740,8 @@ begin
   if Focused then
   begin
     R := Rect(2, 2, ClientWidth - 2, ClientHeight - 2);
-    SetBkColor(Canvas.Handle, clWhite);
+    Canvas.Brush.Color:=clWhite;
+    //SetBkColor(Canvas.Handle, clWhite);
     SetTextColor(clBlack);
     Canvas.DrawFocusRect(R);
   end;
@@ -823,6 +846,10 @@ begin
 end;
 
 initialization
+  {$ifdef windows}
   Screen.Cursors[crHandPoint] := LoadCursor(0, IDC_HAND); // Get the normal hand cursor
-
+  {$else}
+  //TODO
+  Screen.Cursors[crHandPoint] := crHandPoint; //  LoadCursorFromLazarusResource('HandPoint'); // Get the normal hand cursor
+  {$endif}
 end.
