@@ -96,31 +96,37 @@ var
   c: TBitmap;
   char_len: Integer;
 begin
-  c := TBitmap.Create;
-  c.Canvas.Font.Assign(self.Font);
-  if length(self.Text) = 0 then
+  if not (csDestroyingHandle in ControlState) then
   begin
-    Result := 0;
-    Exit;
+    c := TBitmap.Create;
+    c.Canvas.Font.Assign(self.Font);
+    if length(self.Text) = 0 then
+    begin
+      Result := 0;
+      Exit;
+    end;
+    char_len := c.Canvas.TextWidth(self.Text) div length(self.Text);
+    Result := c.Canvas.TextWidth(self.Text) + char_len;
   end;
-  char_len := c.Canvas.TextWidth(self.Text) div length(self.Text);
-  Result := c.Canvas.TextWidth(self.Text) + char_len;
 end;
 
 procedure TWaptSearchEdit.HideIconForText;
 var
   max_width : Integer;
 begin
-  max_width := Width - FSearchIconSize - FSearchIconSpacingLeft;
-  if (GetFontSize >= max_width) and GetSearchIconVisible then
+  if not (csDestroyingHandle in ControlState) then
   begin
-    SetSearchIconVisible(false);
-    FSearchIconIsHidden := true;
-  end
-  else if (GetFontSize < max_width) and FSearchIconIsHidden then
-  begin
-    SetSearchIconVisible(true);
-    FSearchIconIsHidden := false;
+    max_width := Width - FSearchIconSize - FSearchIconSpacingLeft;
+    if (GetFontSize >= max_width) and GetSearchIconVisible then
+    begin
+      SetSearchIconVisible(false);
+      FSearchIconIsHidden := true;
+    end
+    else if (GetFontSize < max_width) and FSearchIconIsHidden then
+    begin
+      SetSearchIconVisible(true);
+      FSearchIconIsHidden := false;
+    end;
   end;
 end;
 
