@@ -267,8 +267,10 @@ begin
       end;
     WM_COPY:
       Clipboard.AsText := FTags.DelimitedText;
+    {$ifdef windows}
     WM_CLEAR:
       FTags.Clear;
+    {$endif}
     WM_CUT:
       begin
         Clipboard.AsText := FTags.DelimitedText;
@@ -366,8 +368,10 @@ begin
   case Key of
     VK_END:
       ShowEditor;
+    {$ifdef windows}
     VK_DELETE:
       Perform(WM_CLEAR, 0, 0);
+    {$endif}
     VK_INSERT:
       Perform(WM_PASTE, 0, 0);
   end;
