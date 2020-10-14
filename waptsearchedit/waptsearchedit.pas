@@ -114,7 +114,7 @@ procedure TWaptSearchEdit.HideIconForText;
 var
   max_width : Integer;
 begin
-  if not (csDestroyingHandle in ControlState) then
+  if (not (csDestroyingHandle in ControlState)) and (FSearchIconSpacingLeft >= 0) then
   begin
     max_width := Width - FSearchIconSize - FSearchIconSpacingLeft;
     if (GetFontSize >= max_width) and GetSearchIconVisible then
@@ -141,12 +141,12 @@ procedure TWaptSearchEdit.DoSetBounds(ALeft, ATop, AWidth, AHeight: integer);
 begin
   inherited DoSetBounds(ALeft, ATop, AWidth, AHeight);
 
-  if FEmbeddedImage = nil then Exit;
-  FEmbeddedImage.SetBounds(ALeft, ATop,  FSearchIconSize, FSearchIconSize);
-
   if FImagePanel = nil then Exit;
-  FImagePanel.SetBounds(ALeft + AWidth - FSearchIconSpacingLeft - FSearchIconSize,
-  ATop + (height div 2 - SearchIconSize div 2), FImagePanel.Width, FImagePanel.Height);
+  FImagePanel.BorderSpacing.Right := FSearchIconSpacingLeft;
+  FImagePanel.SetBounds(0, 0, FSearchIconSize, FSearchIconSize);
+
+  if FEmbeddedImage = nil then Exit;
+  FEmbeddedImage.SetBounds(0, 0,  FSearchIconSize, FSearchIconSize);
 end;
 
 procedure TWaptSearchEdit.SetUpEdit;
@@ -159,11 +159,17 @@ end;
 procedure TWaptSearchEdit.SetUpPanel;
 begin
   FImagePanel.ControlStyle := FImagePanel.ControlStyle + [csNoDesignSelectable];
-  FImagePanel.AutoSize := true;
+  FImagePanel.AutoSize := false;
   FImagePanel.Visible := true;
   FImagePanel.BevelOuter := bvNone;
   FImagePanel.BevelInner := bvNone;
   FImagePanel.Color := clNone;
+  FImagePanel.Align := alNone;
+  FImagePanel.Anchors := [akRight, akTop];
+  FImagePanel.AnchorSide[akRight].Side := asrRight;
+  FImagePanel.AnchorSide[akRight].Control := self;
+  FImagePanel.AnchorSide[akTop].Side := asrCenter;
+  FImagePanel.AnchorSide[akTop].Control := self;
 end;
 
 procedure TWaptSearchEdit.SetUpImage;
@@ -174,6 +180,8 @@ begin
   FEmbeddedImage.stretch := true;
   FEmbeddedImage.Visible := true;
   FEmbeddedImage.Cursor := crHandPoint;
+  FEmbeddedImage.Align := alNone;
+  FEmbeddedImage.Anchors := [];
   FSearchIconIsHidden := false;
 end;
 
