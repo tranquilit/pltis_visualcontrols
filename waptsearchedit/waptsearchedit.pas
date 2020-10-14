@@ -38,6 +38,7 @@ type
   public
      constructor Create(AOwner: TComponent); override;
      procedure TextChanged; override;
+     procedure EnabledChanged; override;
 
   published
       property SearchIconSize: TConstraintSize read FSearchIconSize write SetSearchIconSize;
@@ -68,6 +69,10 @@ procedure TWaptSearchEdit.SetSearchIconSpacingLeft(Value: Integer);
 begin
   if FSearchIconSpacingLeft = Value then Exit;
   FSearchIconSpacingLeft := Value;
+  if FSearchIconSpacingLeft >= 0 then
+    FImagePanel.Color := clNone
+  else
+    FImagePanel.Color := FImagePanel.Parent.Color;
   DoSetBounds(Left, Top, Width, Height);
 end;
 
@@ -216,6 +221,20 @@ procedure TWaptSearchEdit.TextChanged;
 begin
   inherited TextChanged;
   HideIconForText;
+end;
+
+procedure TWaptSearchEdit.EnabledChanged;
+begin
+  inherited EnabledChanged;
+  if self.Enabled = False then
+    FImagePanel.Color := clDefault
+  else
+  begin
+      if FSearchIconSpacingLeft >= 0 then
+        FImagePanel.Color := clNone
+      else
+        FImagePanel.Color := FImagePanel.Parent.Color;
+  end;
 end;
 
 initialization
